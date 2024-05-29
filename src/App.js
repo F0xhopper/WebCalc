@@ -17,43 +17,43 @@ function App() {
     "+",
     "0",
     ".",
-    "/",
+    "÷",
     "-",
     "c",
     "=",
   ];
   const calculate = () => {
-    const stringWithBracketsAroundNegativeNumbers = [];
+    const stringWithBracketsForNegatives = [];
 
+    // Add brackets around negative numbers to preserve them
     for (let i = 0; i < ioText.length; i++) {
-      if (ioText[i] == "-" && !/[0123456789]/.test(ioText[i - 1])) {
-        stringWithBracketsAroundNegativeNumbers.push(ioText[i] + ioText[i + 1]);
-        i++;
+      if (ioText[i] === "-" && (i === 0 || !/[0-9.]/.test(ioText[i - 1]))) {
+        let j = i + 1;
+        // Enables the reading of numbers longer than 1 digit after recoginised as negative number
+        while (j < ioText.length && /[0-9.]/.test(ioText[j])) {
+          j++;
+        }
+        stringWithBracketsForNegatives.push("(" + ioText.substring(i, j) + ")");
+        i = j - 1;
       } else {
-        stringWithBracketsAroundNegativeNumbers.push(ioText[i]);
+        stringWithBracketsForNegatives.push(ioText[i]);
       }
     }
-    console.log(stringWithBracketsAroundNegativeNumbers);
-    const operands2 = [];
-    const operations2 = [];
-    stringWithBracketsAroundNegativeNumbers.forEach((element) => {
-      // Check if the element is an operand (a number)
-      if (!isNaN(parseFloat(element))) {
-        operands2.push(element);
-      } else {
-        // If it's not a number, assume it's an operation
-        operations2.push(element);
-      }
-    });
-    console.log(operands2, operations2);
 
-    let operands = operands2.map(Number).map((num) => parseFloat(num));
-    let operators = operations2.filter((item) => item !== "");
+    const processedText = stringWithBracketsForNegatives.join("");
 
+    // Extract operands and operators using regex
+    const operandRegex = /-?\d+(\.\d+)?/g;
+    const operatorRegex = /[^\d.()-]+/g;
+
+    let operands = processedText.match(operandRegex).map(Number);
+    let operators = processedText.match(operatorRegex) || [];
+    console.log(processedText, operands, operators);
+
+    // Perform multiplication and division first
     let i = 0;
     while (i < operators.length) {
-      if (operators[i] === "x" || operators[i] === "/") {
-        console.log(operators[i], operands[i], operands[i + 1]);
+      if (operators[i] === "x" || operators[i] === "÷") {
         const result =
           operators[i] === "x"
             ? operands[i] * operands[i + 1]
@@ -65,6 +65,7 @@ function App() {
       }
     }
 
+    // Perform addition and subtraction
     i = 0;
     while (i < operators.length) {
       const result =
@@ -74,11 +75,14 @@ function App() {
       operands.splice(i, 2, result);
       operators.splice(i, 1);
     }
+
     console.log(operands, operators);
-    if (String(operands[0]) == "Infinity") {
+
+    // Set the result or handle infinity
+    if (String(operands[0]) === "Infinity") {
       setIoText("Not possible!");
       setTimeout(() => {
-        setIoText();
+        setIoText("");
       }, 2000);
     } else {
       setIoText(String(operands[0]));
