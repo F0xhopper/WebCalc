@@ -23,32 +23,46 @@ function App() {
     "=",
   ];
   const calculate = () => {
-    const arrayWithBracketsForNegatives = [];
+    const stringWithBracketsForNegatives = [];
 
-    // Add brackets around negative numbers to preserve them
     for (let i = 0; i < ioText.length; i++) {
+      // Check if negative number then read until end of negative
       if (ioText[i] === "-" && (i === 0 || !/[0-9.]/.test(ioText[i - 1]))) {
         let j = i + 1;
-        // Enables the reading of numbers longer than 1 digit after recoginised as negative number
         while (j < ioText.length && /[0-9.]/.test(ioText[j])) {
           j++;
         }
-        arrayWithBracketsForNegatives.push("(" + ioText.substring(i, j) + ")");
+        stringWithBracketsForNegatives.push(`${ioText.substring(i, j)}`);
         i = j - 1;
       } else {
-        arrayWithBracketsForNegatives.push(ioText[i]);
+        // Check if posotive number, then read until end of number
+        if (/[0-9.]/.test(ioText[i])) {
+          let j = i;
+          // Read until the end of the number
+          while (j < ioText.length && /[0-9.]/.test(ioText[j])) {
+            j++;
+          }
+          stringWithBracketsForNegatives.push(ioText.substring(i, j));
+          i = j - 1;
+        } else {
+          // Adds the none operands to the array
+          stringWithBracketsForNegatives.push(ioText[i]);
+        }
       }
     }
-
-    const processedText = arrayWithBracketsForNegatives.join("");
-
-    // Extract operands and operators using regex
-    const operandRegex = /-?\d+(\.\d+)?/g;
-    const operatorRegex = /[^\d.()-]+/g;
-
-    let operands = processedText.match(operandRegex).map(Number);
-    let operators = processedText.match(operatorRegex) || [];
-    console.log(processedText, operands, operators);
+    // Seperate all operands and operators into two arrays
+    let operatorFromStartArray = [];
+    let operandFromStartArray = [];
+    stringWithBracketsForNegatives.forEach((item) => {
+      if (!isNaN(item)) {
+        operandFromStartArray.push(item);
+      } else {
+        operatorFromStartArray.push(item);
+      }
+    });
+    // Arrays for calculating
+    let operands = operandFromStartArray.map(Number);
+    let operators = operatorFromStartArray;
 
     // Perform multiplication and division first
     let i = 0;
@@ -75,8 +89,6 @@ function App() {
       operands.splice(i, 2, result);
       operators.splice(i, 1);
     }
-
-    console.log(operands, operators);
 
     // Set the result or handle infinity
     if (String(operands[0]) === "Infinity") {
@@ -126,3 +138,4 @@ function App() {
 }
 
 export default App;
+
