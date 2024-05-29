@@ -23,7 +23,7 @@ function App() {
     "=",
   ];
   const calculate = () => {
-    const stringWithBracketsForNegatives = [];
+    const arrayWithBracketsForNegatives = [];
 
     // Add brackets around negative numbers to preserve them
     for (let i = 0; i < ioText.length; i++) {
@@ -33,14 +33,14 @@ function App() {
         while (j < ioText.length && /[0-9.]/.test(ioText[j])) {
           j++;
         }
-        stringWithBracketsForNegatives.push("(" + ioText.substring(i, j) + ")");
+        arrayWithBracketsForNegatives.push("(" + ioText.substring(i, j) + ")");
         i = j - 1;
       } else {
-        stringWithBracketsForNegatives.push(ioText[i]);
+        arrayWithBracketsForNegatives.push(ioText[i]);
       }
     }
 
-    const processedText = stringWithBracketsForNegatives.join("");
+    const processedText = arrayWithBracketsForNegatives.join("");
 
     // Extract operands and operators using regex
     const operandRegex = /-?\d+(\.\d+)?/g;
